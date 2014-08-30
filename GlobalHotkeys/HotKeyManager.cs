@@ -89,52 +89,52 @@ namespace GlobalHotkeys
                 {
                     // Hot Key Handling
                     case Constants.WM_HOTKEY:
-                        {
-                            // get the keys.
-                            Keys key = (Keys)(((int)m.LParam >> 16) & 0xFFFF);
-                            ModifierKeys modifier = (ModifierKeys)((int)m.LParam & 0xFFFF);
+                    {
+                        // get the keys.
+                        Keys key = (Keys)(((int)m.LParam >> 16) & 0xFFFF);
+                        ModifierKeys modifier = (ModifierKeys)((int)m.LParam & 0xFFFF);
 
-                            // invoke the event to notify the parent.
-                            if (HotKeyPressed != null) { HotKeyPressed(this, new HotKeyPressedEventArgs(modifier, key)); }
-                        }
-                        break;
+                        // invoke the event to notify the parent.
+                        if (HotKeyPressed != null) { HotKeyPressed(this, new HotKeyPressedEventArgs(modifier, key)); }
+                    }
+                    break;
 
                     // Media Key Handling
                     case Constants.WM_APPCOMMAND:
+                    {
+                        // http://msdn.microsoft.com/en-gb/library/windows/desktop/ms646275%28v=vs.85%29.aspx
+                        ApplicationCommand command = (ApplicationCommand)m.LParam.ToInt32();
+                        switch (command)
                         {
-                            // http://msdn.microsoft.com/en-gb/library/windows/desktop/ms646275%28v=vs.85%29.aspx
-                            ApplicationCommand command = (ApplicationCommand)m.LParam.ToInt32();
-                            switch (command)
+                            case ApplicationCommand.VolumeMute:
+                            case ApplicationCommand.VolumeDown:
+                            case ApplicationCommand.VolumeUp:
+                            case ApplicationCommand.MediaNexttrack:
+                            case ApplicationCommand.MediaPrevioustrack:
+                            case ApplicationCommand.MediaStop:
+                            case ApplicationCommand.MediaPlayPause:
+                            case ApplicationCommand.Close:
+                            case ApplicationCommand.MediaPlay:
+                            case ApplicationCommand.MediaPause:
+                            case ApplicationCommand.MediaFastForward:
+                            case ApplicationCommand.MediaRewind:
                             {
-                                case ApplicationCommand.VolumeMute:
-                                case ApplicationCommand.VolumeDown:
-                                case ApplicationCommand.VolumeUp:
-                                case ApplicationCommand.MediaNexttrack:
-                                case ApplicationCommand.MediaPrevioustrack:
-                                case ApplicationCommand.MediaStop:
-                                case ApplicationCommand.MediaPlayPause:
-                                case ApplicationCommand.Close:
-                                case ApplicationCommand.MediaPlay:
-                                case ApplicationCommand.MediaPause:
-                                case ApplicationCommand.MediaFastForward:
-                                case ApplicationCommand.MediaRewind:
-                                    {
-                                        // invoke the event to notify the parent.  
-                                        if (MediaKeyPressed != null) { MediaKeyPressed(this, new MediaKeyPressedEventArgs(command)); }
+                                // invoke the event to notify the parent.  
+                                if (MediaKeyPressed != null) { MediaKeyPressed(this, new MediaKeyPressedEventArgs(command)); }
 
-                                        // According to MSDN, we should return true if we are handling this message.
-                                        m.Result = new IntPtr(1);
-                                        base.WndProc(ref m);
-                                        return;
-                                    }
+                                // According to MSDN, we should return true if we are handling this message.
+                                m.Result = new IntPtr(1);
+                                base.WndProc(ref m);
+                                return;
                             }
                         }
-                        break;
+                    }
+                    break;
 
                     // Pass all unhandled Messages to the default Window Proc
                     default:
-                        base.WndProc(ref m);
-                        break;
+                    base.WndProc(ref m);
+                    break;
                 }
             }
         }
