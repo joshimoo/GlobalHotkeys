@@ -10,6 +10,7 @@ namespace GlobalHotkeys
     /// </summary>
     internal static class Constants
     {
+        public const int HSHELL_APPCOMMAND = 12;
         public const int WM_HOTKEY = 0x0312;
         public const int WM_APPCOMMAND = 0x0319;
     }

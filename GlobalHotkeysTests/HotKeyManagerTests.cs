@@ -11,7 +11,8 @@ namespace GlobalHotkeys.Tests
     [TestClass()]
     public class HotKeyManagerTests
     {
-        // Native Functions to simulate the key presses:
+
+        #region Native Functions to simulate the key presses:
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
 
@@ -25,6 +26,7 @@ namespace GlobalHotkeys.Tests
             bool returnValue = PostMessage(hWnd, msg, wParam, lParam);
             if (!returnValue) { throw new Win32Exception(Marshal.GetLastWin32Error()); }
         }
+        #endregion
 
 
         // Unit Test Initalization, creates a fresh hotkey manager before every test

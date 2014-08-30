@@ -73,12 +73,40 @@ namespace GlobalHotkeys
         /// </summary>
         private sealed class Window : NativeWindow, IDisposable
         {
+            // Winapi Imports
+            [DllImport("user32.dll")]
+            public static extern bool RegisterShellHookWindow(IntPtr hWnd);
+            [DllImport("user32.dll")]
+            public static extern bool DeregisterShellHookWindow(IntPtr hWnd);
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            static extern uint RegisterWindowMessage(string lpString);
+
+            // Events
             public event EventHandler<HotKeyPressedEventArgs> HotKeyPressed;
             public event EventHandler<MediaKeyPressedEventArgs> MediaKeyPressed;
 
+            // Variables
+            private readonly uint shellMessageID;
+
             // Setup & Cleanup
-            public Window() { this.CreateHandle(new CreateParams()); }
-            public void Dispose() { this.DestroyHandle(); }
+            public Window()
+            {
+                this.CreateHandle(new CreateParams());
+
+                // Register the ShellHook so we can receive all AppCommands even if we don't have focus. 
+                // DOCUMENTATION: http://msdn.microsoft.com/en-us/library/ms911004.aspx
+                shellMessageID = RegisterWindowMessage("SHELLHOOK");
+
+                // Register the Window that receives the shell Messages. 
+                // DOCUMENTATION: http://msdn.microsoft.com/en-us/library/windows/desktop/ms644989%28v=vs.85%29.aspx
+                RegisterShellHookWindow(Handle);
+            }
+            public void Dispose()
+            {
+                // Cleanup our ShellHook
+                DeregisterShellHookWindow(Handle);
+                this.DestroyHandle();
+            }
 
             /// <summary>
             /// Windows Message Loop
@@ -104,6 +132,7 @@ namespace GlobalHotkeys
                     case Constants.WM_APPCOMMAND:
                     {
                         // http://msdn.microsoft.com/en-gb/library/windows/desktop/ms646275%28v=vs.85%29.aspx
+                        // TODO: Fix the LParam handling and provide a method that resembles the GET_APPCOMMAND_LPARAM MACRO
                         ApplicationCommand command = (ApplicationCommand)m.LParam.ToInt32();
                         switch (command)
                         {
@@ -134,7 +163,17 @@ namespace GlobalHotkeys
 
                     // Pass all unhandled Messages to the default Window Proc
                     default:
-                    base.WndProc(ref m);
+                    {
+                        // A ShellHook message
+                        if (m.Msg == shellMessageID)
+                        {
+                            // We only care about the HSHELL_APPCOMMAND = 12
+                            if (m.WParam.ToInt32() == Constants.HSHELL_APPCOMMAND) { goto case Constants.WM_APPCOMMAND; }
+                        }
+
+                        // All unhandeled messages the default proc should process
+                        base.WndProc(ref m);
+                    }
                     break;
                 }
             }
