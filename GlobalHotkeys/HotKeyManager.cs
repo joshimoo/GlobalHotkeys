@@ -19,6 +19,7 @@ namespace GlobalHotkeys
 
         // Variables
         private readonly Window window = new Window();
+        internal IntPtr Handle { get { return window.Handle; } }
         private int currentId = 0;
 
         // Events
@@ -42,7 +43,7 @@ namespace GlobalHotkeys
         public void Dispose()
         {
             // unregister all the registered hot keys.
-            for (int i = currentId; i > 0; i--) { UnregisterHotKey(window.Handle, i); }
+            for (int i = currentId; i > 0; i--) { UnregisterHotKey(Handle, i); }
 
             // dispose the inner native window.
             window.Dispose();
@@ -60,7 +61,7 @@ namespace GlobalHotkeys
             currentId++;
 
             // register the hot key.
-            if (!RegisterHotKey(window.Handle, currentId, (uint)modifier, (uint)key))
+            if (!RegisterHotKey(Handle, currentId, (uint)modifier, (uint)key))
             {
                 throw new InvalidOperationException("Couldn’t register the hot key.");
             }

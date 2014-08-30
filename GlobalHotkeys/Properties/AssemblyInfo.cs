@@ -19,6 +19,9 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
+// Allow the Unit Testing Project to test Methods and Classes defined as internal
+[assembly: InternalsVisibleTo("GlobalHotkeysTests")]
+
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("501b5e67-4fd9-4ee5-b93f-77ffd6416664")]
 
