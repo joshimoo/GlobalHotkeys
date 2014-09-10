@@ -149,6 +149,7 @@ namespace GlobalHotkeys
                             case ApplicationCommand.MediaFastForward:
                             case ApplicationCommand.MediaRewind:
                             {
+                                //TODO: Think about adding individual events for the specific media keys this way we can register the mediakeys as a hotkey as well and just send out the same event.
                                 // invoke the event to notify the parent.  
                                 if (MediaKeyPressed != null) { MediaKeyPressed(this, new MediaKeyPressedEventArgs(command)); }
 
